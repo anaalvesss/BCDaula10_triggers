@@ -1,17 +1,22 @@
 USE Pizzaria;
 -- Desafio 02
+USE Pizzaria;
 DROP TRIGGER IF EXISTS atualizaValorPedido;
-DELIMITER $$
+DELIMITER //
 
 CREATE TRIGGER atualizaValorPedido
-AFTER INSERT ON Itens_Pedido FOR EACH ROW
+AFTER INSERT ON itens_pedido
+FOR EACH ROW
 BEGIN
-    UPDATE Pedidos
+    UPDATE pedidos
     SET valor = (
-        SELECT SUM(quantidade * valor) FROM Itens_Pedido WHERE pedido_id = NEW.pedido_id
+        SELECT COALESCE(SUM(valor * quantidade), 0)
+        FROM itens_pedido
+        WHERE pedido_id = NEW.pedido_id
     )
     WHERE pedido_id = NEW.pedido_id;
-END $$
+END//
+
 DELIMITER ;
 -- 1: Claudiane Mendes Trigueiro Silva
 INSERT INTO Pedidos (cliente_id, data, hora, valor)
